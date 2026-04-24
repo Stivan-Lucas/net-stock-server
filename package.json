@@ -1,0 +1,30 @@
+{
+  "version": "0.0.0",
+  "name": "server",
+  "module": "src/server.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun --watch src/server.ts",
+    "format": "biome format --write .",
+    "lint": "biome lint --write . && oxlint --fix",
+    "lint:ox": "oxlint --deny-warnings",
+    "check": "biome check --write . && oxlint",
+    "check:unsafe": "biome check --write --unsafe .",
+    "ci": "biome check . && oxlint --deny-warnings",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
+    "test:watch": "bun test --watch"
+  },
+  "dependencies": {
+    "fastify": "^5.8.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.13",
+    "@types/bun": "latest",
+    "oxlint": "^1.61.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
