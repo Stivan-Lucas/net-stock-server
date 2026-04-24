@@ -1,0 +1,44 @@
+name: 🚀 Release & Growth
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: 📦 Semantic Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: 🟢 Setup Node.js (Required for Semantic Release)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: ⚡ Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: 📦 Instalar dependências
+        run: bun install --frozen-lockfile
+
+      - name: 🧪 Rodar Verificações (CI)
+        run: bun run ci
+
+      - name: 🏗️ Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bunx semantic-release
