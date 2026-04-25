@@ -1,3 +1,10 @@
+## [1.3.7](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.3.6...v1.3.7) (2026-04-25)
+
+
+### Bug Fixes
+
+* **ci:** use regex head extraction for coverage value ([c2a378d](https://github.com/Stivan-Lucas/net-stock-server/commit/c2a378d6ed4da252994a111f369eb4fdcc89105c))
+
 ## [1.3.6](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.3.5...v1.3.6) (2026-04-25)
 
 
