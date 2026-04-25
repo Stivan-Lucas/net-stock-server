@@ -13,7 +13,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      # Resolve o warning do GitHub (força Node 24)
+      # Força Node 24 para sumir com os warnings de depreciação
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       NODE_ENV: test
       PORT: 3000
@@ -39,43 +39,41 @@ jobs:
       - name: Run tests with coverage
         id: test_run
         run: |
-          # 1. Roda os testes sem cores
-          bun test --coverage --no-color > coverage.txt
-          cat coverage.txt
+          # Executa os testes e garante que a saída vá para o arquivo sem cores
+          bun test --coverage --no-color 2>&1 | tee coverage.txt
 
-          # 2. Extração via Regex pura (pega o primeiro número decimal após 'All files')
-          # Isso ignora espaços, pipes e qualquer outra formatação de tabela
-          SUMMARY=$(grep "All files" coverage.txt | grep -oE '[0-9]+\.[0-9]+' | head -n 1)
+          # Extração robusta:
+          # 1. Filtra a linha 'All files'
+          # 2. Remove pipes (|) e espaços extras
+          # 3. Pega o segundo número decimal (que é o % de linhas)
+          SUMMARY=$(grep "All files" coverage.txt | tr -d '|' | grep -oE '[0-9]+\.[0-9]+' | sed -n '2p')
 
-          # Se por algum motivo o Bun não colocar o .00 em números inteiros (ex: 100)
+          # Fallback: se não achar o segundo (Lines), tenta o primeiro (Funcs)
           if [ -z "$SUMMARY" ]; then
-            SUMMARY=$(grep "All files" coverage.txt | grep -oE '[0-9]+' | head -n 1)
+            SUMMARY=$(grep "All files" coverage.txt | tr -d '|' | grep -oE '[0-9]+\.[0-9]+' | head -n 1)
           fi
 
           echo "COVERAGE=$SUMMARY" >> $GITHUB_OUTPUT
-          echo "Valor capturado: $SUMMARY"
+          echo "✅ Valor final extraído: $SUMMARY"
 
-          # 3. Validação
+          # Validação de Threshold (Mínimo 90%)
           THRESHOLD=90
-          # Comparação usando awk para lidar com decimais
-          CHECK=$(awk -v n1="$SUMMARY" -v n2="$THRESHOLD" 'BEGIN {if (n1 < n2) print "fail"; else print "pass"}')
+          CHECK=$(awk -v n1="$SUMMARY" -v n2="$THRESHOLD" 'BEGIN {print (n1 < n2 ? "fail" : "pass")}')
 
-          if [ "$CHECK" = "fail" ]; then
-            echo "❌ Coverage insuficiente: $SUMMARY% (Mínimo: $THRESHOLD%)"
+          if [ "$CHECK" == "fail" ]; then
+            echo "❌ Coverage de $SUMMARY% é menor que o mínimo de $THRESHOLD%"
             exit 1
-          else
-            echo "✅ Coverage aceitável: $SUMMARY%"
           fi
 
       - name: Create Badge JSON
+        if: success()
         run: |
           mkdir -p badges
-          # Pegando o valor do output do step anterior
           VAL="${{ steps.test_run.outputs.COVERAGE }}"
           echo "{\"schemaVersion\": 1, \"label\": \"coverage\", \"message\": \"$VAL%\", \"color\": \"brightgreen\"}" > badges/coverage.json
 
       - name: Deploy Badge to Branch
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && success()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
