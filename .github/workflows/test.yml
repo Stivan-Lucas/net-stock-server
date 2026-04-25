@@ -37,23 +37,24 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run tests with coverage
-        id: test_run # Adicionado ID para referenciar o output
+        id: test_run
         run: |
-          # Rodamos o teste uma vez e salvamos o output
-          OUTPUT=$(bun test --coverage)
-          echo "$OUTPUT"
+          # Rodamos o teste e salvamos em um arquivo temporário para garantir a leitura
+          bun test --coverage > coverage_output.txt
+          cat coverage_output.txt
 
-          # Extrai o valor
-          SUMMARY=$(echo "$OUTPUT" | grep "All files" | awk '{print $6}')
+          # Extrai apenas o número decimal da linha "All files"
+          # Procuramos por algo como "97.58" ou "100.00"
+          SUMMARY=$(grep "All files" coverage_output.txt | grep -oE "[0-9]+\.[0-9]+")
+
+          echo "Captured Coverage: $SUMMARY"
           echo "COVERAGE=$SUMMARY" >> $GITHUB_OUTPUT
 
           # Validação de Threshold
           COVERAGE_THRESHOLD=90
           if (( $(echo "$SUMMARY < $COVERAGE_THRESHOLD" | bc -l) )); then
-            echo "❌ Coverage está abaixo de $COVERAGE_THRESHOLD% ($SUMMARY%)"
+            echo "❌ Coverage insuficiente: $SUMMARY%"
             exit 1
-          else
-            echo "✅ Coverage aceitável ($SUMMARY%)!"
           fi
 
       - name: Create Badge JSON
