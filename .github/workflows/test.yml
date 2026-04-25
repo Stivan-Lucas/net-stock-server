@@ -39,20 +39,21 @@ jobs:
       - name: Run tests with coverage
         id: test_run
         run: |
-          # 1. Roda os testes sem cores e salva
+          # 1. Roda os testes e limpa a saída de possíveis caracteres especiais
           bun test --coverage --no-color > coverage.txt
           cat coverage.txt
 
-          # 2. Captura o valor usando AWK (mais estável que grep + regex)
-          # Ele procura a linha 'All files' e pega a coluna onde está o % de linhas
-          SUMMARY=$(awk '/All files/ {print $6}' coverage.txt)
+          # 2. Extração usando '|' como separador (Field Separator)
+          # A coluna '% Lines' é a 4ª coluna quando se separa por '|'
+          SUMMARY=$(grep "All files" coverage.txt | awk -F'|' '{print $3}' | xargs)
 
           echo "COVERAGE=$SUMMARY" >> $GITHUB_OUTPUT
           echo "Valor capturado: $SUMMARY"
 
-          # 3. Validação de Threshold usando AWK (evita dependência do bc)
+          # 3. Validação de Threshold
           THRESHOLD=90
-          CHECK=$(awk -v n1="$SUMMARY" -v n2="$THRESHOLD" 'BEGIN {print (n1 < n2 ? "fail" : "pass")}')
+          # Comparação robusta via AWK
+          CHECK=$(awk -v n1="$SUMMARY" -v n2="$THRESHOLD" 'BEGIN {if (n1 < n2) print "fail"; else print "pass"}')
 
           if [ "$CHECK" = "fail" ]; then
             echo "❌ Coverage insuficiente: $SUMMARY% (Mínimo: $THRESHOLD%)"
