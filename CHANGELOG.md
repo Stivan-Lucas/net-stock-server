@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.3.0...v1.3.1) (2026-04-25)
+
+
+### Bug Fixes
+
+* **ci:** provide required environment variables for test runner ([fa910c2](https://github.com/Stivan-Lucas/net-stock-server/commit/fa910c2daea4c677995093937e6075689382dde4))
+
 # [1.3.0](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.2.0...v1.3.0) (2026-04-25)
 
 
