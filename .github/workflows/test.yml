@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run tests with coverage
+        run: |
+          # Executa o teste e extrai a porcentagem total de linhas
+          # Se o valor for menor que 90, o script sai com erro (exit 1)
+          SUMMARY=$(bun test --coverage | grep "All files" | awk '{print $6}')
+          echo "Total Coverage: $SUMMARY%"
+
+          # Comparação numérica (remove o ponto decimal para facilitar se necessário)
+          COVERAGE_THRESHOLD=90
+          if (( $(echo "$SUMMARY < $COVERAGE_THRESHOLD" | bc -l) )); then
+            echo "❌ Coverage está abaixo de $COVERAGE_THRESHOLD%"
+            exit 1
+          else
+            echo "✅ Coverage aceitável!"
+          fi
+
+      - name: Upload coverage reports (Optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
