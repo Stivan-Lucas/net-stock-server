@@ -1,3 +1,11 @@
+# [1.2.0](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.1.0...v1.2.0) (2026-04-25)
+
+
+### Features
+
+* implement strict environment validation with Zod ([732a936](https://github.com/Stivan-Lucas/net-stock-server/commit/732a936cd0e7c12cffbee23ba9b65036b74955e1))
+* setup dynamic pino-roll logging with multi-target files ([a71d3a8](https://github.com/Stivan-Lucas/net-stock-server/commit/a71d3a80f76db547c0389b0244d893e910cd6d14))
+
 # [1.1.0](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.0.0...v1.1.0) (2026-04-24)
 
 
