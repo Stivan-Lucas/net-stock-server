@@ -39,22 +39,28 @@ jobs:
       - name: Run tests with coverage
         id: test_run
         run: |
-          # Rodamos o teste e salvamos em um arquivo temporário para garantir a leitura
+          # Rodamos o teste e salvamos o output
           bun test --coverage > coverage_output.txt
           cat coverage_output.txt
 
-          # Extrai apenas o número decimal da linha "All files"
-          # Procuramos por algo como "97.58" ou "100.00"
-          SUMMARY=$(grep "All files" coverage_output.txt | grep -oE "[0-9]+\.[0-9]+")
+          # 1. Pega a linha "All files"
+          # 2. Usa sed para transformar múltiplos espaços em apenas um
+          # 3. Pega a 6ª coluna (onde está o 98.21)
+          SUMMARY=$(grep "All files" coverage_output.txt | sed 's/  */ /g' | cut -d' ' -f6)
 
           echo "Captured Coverage: $SUMMARY"
           echo "COVERAGE=$SUMMARY" >> $GITHUB_OUTPUT
 
           # Validação de Threshold
           COVERAGE_THRESHOLD=90
-          if (( $(echo "$SUMMARY < $COVERAGE_THRESHOLD" | bc -l) )); then
+          # Usamos awk para comparação, que é mais nativo em ambientes minimalistas
+          RESULT=$(echo "$SUMMARY $COVERAGE_THRESHOLD" | awk '{if ($1 < $2) print "fail"; else print "pass"}')
+
+          if [ "$RESULT" == "fail" ]; then
             echo "❌ Coverage insuficiente: $SUMMARY%"
             exit 1
+          else
+            echo "✅ Coverage aceitável: $SUMMARY%"
           fi
 
       - name: Create Badge JSON
