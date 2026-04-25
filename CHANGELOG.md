@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.3.4...v1.3.5) (2026-04-25)
+
+
+### Bug Fixes
+
+* **ci:** switch to awk for resilient coverage parsing and comparison ([a0ee421](https://github.com/Stivan-Lucas/net-stock-server/commit/a0ee4214bf2842a3c758dfba1a07bb2c9688d67d))
+
 ## [1.3.4](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.3.3...v1.3.4) (2026-04-25)
 
 
