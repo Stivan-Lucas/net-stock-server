@@ -16,10 +16,12 @@
     "commitlint",
     "dotenv",
     "eslintcache",
+    "Fastify",
     "GITHUB",
     "oxlint",
     "stivan",
     "Stivan",
-    "TEKNO"
+    "TEKNO",
+    "treeify"
   ]
 }
