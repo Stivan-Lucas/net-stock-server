@@ -39,23 +39,26 @@ jobs:
       - name: Run tests with coverage
         id: test_run
         run: |
-          # Rodamos com --no-color para garantir que o texto venha limpo
+          # 1. Roda os testes sem cores e salva
           bun test --coverage --no-color > coverage.txt
           cat coverage.txt
 
-          # Extração ultra-robusta:
-          # 1. Pega a linha do 'All files'
-          # 2. Extrai o primeiro número decimal que encontrar (o % de linhas)
-          SUMMARY=$(grep "All files" coverage.txt | grep -oE '[0-9]+\.[0-9]+' | head -n 1)
+          # 2. Captura o valor usando AWK (mais estável que grep + regex)
+          # Ele procura a linha 'All files' e pega a coluna onde está o % de linhas
+          SUMMARY=$(awk '/All files/ {print $6}' coverage.txt)
 
           echo "COVERAGE=$SUMMARY" >> $GITHUB_OUTPUT
           echo "Valor capturado: $SUMMARY"
 
-          # Validação simplificada
+          # 3. Validação de Threshold usando AWK (evita dependência do bc)
           THRESHOLD=90
-          if (( $(echo "$SUMMARY < $THRESHOLD" | bc -l) )); then
-            echo "Coverage abaixo de $THRESHOLD%"
+          CHECK=$(awk -v n1="$SUMMARY" -v n2="$THRESHOLD" 'BEGIN {print (n1 < n2 ? "fail" : "pass")}')
+
+          if [ "$CHECK" = "fail" ]; then
+            echo "❌ Coverage insuficiente: $SUMMARY% (Mínimo: $THRESHOLD%)"
             exit 1
+          else
+            echo "✅ Coverage aceitável: $SUMMARY%"
           fi
 
       - name: Create Badge JSON
