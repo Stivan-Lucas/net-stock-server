@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.3.3...v1.3.4) (2026-04-25)
+
+
+### Bug Fixes
+
+* **ci:** fix coverage extraction with no-color and update to node24 ([c19332d](https://github.com/Stivan-Lucas/net-stock-server/commit/c19332d7bab6fa40fdbe844ab0fe38ef9130d771))
+
 ## [1.3.3](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.3.2...v1.3.3) (2026-04-25)
 
 
