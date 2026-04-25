@@ -1,3 +1,10 @@
+## [1.3.6](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.3.5...v1.3.6) (2026-04-25)
+
+
+### Bug Fixes
+
+* **ci:** use pipe separator for precise coverage extraction ([3b5bfa2](https://github.com/Stivan-Lucas/net-stock-server/commit/3b5bfa2c5153906267ba205a5e6196ae093133e2))
+
 ## [1.3.5](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.3.4...v1.3.5) (2026-04-25)
 
 
