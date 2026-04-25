@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.3.2...v1.3.3) (2026-04-25)
+
+
+### Bug Fixes
+
+* **ci:** fix coverage parsing logic in github actions ([98bdeb8](https://github.com/Stivan-Lucas/net-stock-server/commit/98bdeb83b4d156f8c71c3bda9f7eff16c509da52))
+
 ## [1.3.2](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.3.1...v1.3.2) (2026-04-25)
 
 
