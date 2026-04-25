@@ -14,6 +14,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      NODE_ENV: test
+      PORT: 3000
+      HOST: localhost
+      LOG_LEVEL: info
+      LOG_LEVELS_FILES: info,error
+      LOG_ROTATION_SIZE: 10m
+      LOG_ROTATION_INTERVAL: 1d
+      LOG_KEEP_COUNT: 5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
