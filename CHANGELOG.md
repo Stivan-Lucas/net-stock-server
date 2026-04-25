@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.2.0...v1.3.0) (2026-04-25)
+
+
+### Features
+
+* **config:** implement environment variables validation with zod ([22a83ed](https://github.com/Stivan-Lucas/net-stock-server/commit/22a83ed66c61ba0674c27efb9116a2be15feab8e))
+
 # [1.2.0](https://github.com/Stivan-Lucas/net-stock-server/compare/v1.1.0...v1.2.0) (2026-04-25)
 
 
