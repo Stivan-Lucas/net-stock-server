@@ -6,15 +6,15 @@ on:
   push:
     branches: [main]
 
-# Permissões necessárias para criar a branch de badges e fazer o deploy
 permissions:
   contents: write
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     env:
+      # Resolve o warning do GitHub (força Node 24)
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       NODE_ENV: test
       PORT: 3000
       HOST: localhost
@@ -39,42 +39,33 @@ jobs:
       - name: Run tests with coverage
         id: test_run
         run: |
-          # Rodamos o teste e salvamos o output
-          bun test --coverage > coverage_output.txt
-          cat coverage_output.txt
+          # Rodamos com --no-color para garantir que o texto venha limpo
+          bun test --coverage --no-color > coverage.txt
+          cat coverage.txt
 
-          # 1. Pega a linha "All files"
-          # 2. Usa sed para transformar múltiplos espaços em apenas um
-          # 3. Pega a 6ª coluna (onde está o 98.21)
-          SUMMARY=$(grep "All files" coverage_output.txt | sed 's/  */ /g' | cut -d' ' -f6)
+          # Extração ultra-robusta:
+          # 1. Pega a linha do 'All files'
+          # 2. Extrai o primeiro número decimal que encontrar (o % de linhas)
+          SUMMARY=$(grep "All files" coverage.txt | grep -oE '[0-9]+\.[0-9]+' | head -n 1)
 
-          echo "Captured Coverage: $SUMMARY"
           echo "COVERAGE=$SUMMARY" >> $GITHUB_OUTPUT
+          echo "Valor capturado: $SUMMARY"
 
-          # Validação de Threshold
-          COVERAGE_THRESHOLD=90
-          # Usamos awk para comparação, que é mais nativo em ambientes minimalistas
-          RESULT=$(echo "$SUMMARY $COVERAGE_THRESHOLD" | awk '{if ($1 < $2) print "fail"; else print "pass"}')
-
-          if [ "$RESULT" == "fail" ]; then
-            echo "❌ Coverage insuficiente: $SUMMARY%"
+          # Validação simplificada
+          THRESHOLD=90
+          if (( $(echo "$SUMMARY < $THRESHOLD" | bc -l) )); then
+            echo "Coverage abaixo de $THRESHOLD%"
             exit 1
-          else
-            echo "✅ Coverage aceitável: $SUMMARY%"
           fi
 
       - name: Create Badge JSON
-        # Este passo só roda se os testes passarem
         run: |
           mkdir -p badges
-          # Define a cor baseada no valor (opcional, mas legal)
-          COLOR="brightgreen"
-          COVERAGE=${{ steps.test_run.outputs.COVERAGE }}
-
-          echo "{\"schemaVersion\": 1, \"label\": \"coverage\", \"message\": \"$COVERAGE%\", \"color\": \"$COLOR\"}" > badges/coverage.json
+          # Pegando o valor do output do step anterior
+          VAL="${{ steps.test_run.outputs.COVERAGE }}"
+          echo "{\"schemaVersion\": 1, \"label\": \"coverage\", \"message\": \"$VAL%\", \"color\": \"brightgreen\"}" > badges/coverage.json
 
       - name: Deploy Badge to Branch
-        # Só faz deploy se estiver na branch main (evita criar badges de PRs experimentais)
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3
         with:
