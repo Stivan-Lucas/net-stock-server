@@ -18,6 +18,7 @@
     "dotenv",
     "eslintcache",
     "Fastify",
+    "Funcs",
     "github",
     "GITHUB",
     "oxlint",
